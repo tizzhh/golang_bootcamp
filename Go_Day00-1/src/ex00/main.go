@@ -1,7 +1,7 @@
 package main
 
 import (
-	"ex00/process"
+	"Anscombe/process"
 	"flag"
 	"fmt"
 	"os"

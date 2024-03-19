@@ -1,3 +1,3 @@
-module ex00
+module Anscombe
 
 go 1.21.0

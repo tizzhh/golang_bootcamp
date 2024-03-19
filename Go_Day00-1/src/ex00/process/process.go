@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"math"
 	"os"
-	"slices"
 	"strconv"
 	"strings"
 )
@@ -55,17 +54,19 @@ func CalcMode(nums []int) (mode int) {
 	for _, num := range nums {
 		numberCounts[num]++
 	}
-
-	mode, max_val := slices.Max(nums), numberCounts[nums[0]]
+	mode, max_val := 0, 0
 	for key, val := range numberCounts {
-		if val > max_val {
+		if val >= max_val {
 			max_val = val
+			mode = key
+		} else if val == max_val {
 			if key < mode {
 				mode = key
 			}
 		}
 	}
-	return
+
+	return mode
 }
 
 func CalcSd(nums []int, mean float64) (sd float64) {
