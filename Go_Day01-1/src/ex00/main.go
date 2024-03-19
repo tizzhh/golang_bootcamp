@@ -25,4 +25,12 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Error %s during marshalling file: %s\n", err, filePath)
 		os.Exit(1)
 	}
+
+	var j_x_reader reader.DBReader = &reader.JSONReader{Path: "stolen_database.json"}
+	j_x_reader.ReadData()
+	reader.OutputJsonXml(j_x_reader)
+	j_x_reader = &reader.XMLReader{Path: "original_database.xml"}
+	j_x_reader.ReadData()
+	reader.OutputJsonXml(j_x_reader)
+
 }

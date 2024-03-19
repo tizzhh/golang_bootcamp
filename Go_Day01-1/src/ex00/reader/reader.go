@@ -89,6 +89,17 @@ func (xr *XMLReader) OutputData() error {
 	return nil
 }
 
+func OutputJsonXml(reader DBReader) {
+	switch r := reader.(type) {
+	case (*JSONReader):
+		xr := &XMLReader{Path: r.Path, Cakes: r.Cakes}
+		xr.OutputData()
+	case (*XMLReader):
+		jr := &JSONReader{Path: r.Path, Cakes: r.Cakes}
+		jr.OutputData()
+	}
+}
+
 func ParseInput() (string, error) {
 	var path string
 	if len(os.Args) != 3 || os.Args[1] != "-f" {
