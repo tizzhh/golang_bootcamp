@@ -12,6 +12,7 @@ import (
 type DBReader interface {
 	ReadData() error
 	OutputData() error
+	GetCakeData() []Cake
 }
 
 type Cakes struct {
@@ -22,10 +23,10 @@ type Cakes struct {
 type Cake struct {
 	Name        string       `json:"name" xml:"name"`
 	Time        string       `json:"time" xml:"stovetime"`
-	Ingridients []Ingridient `json:"ingredients" xml:"ingredients>item"`
+	Ingridients []Ingredient `json:"ingredients" xml:"ingredients>item"`
 }
 
-type Ingridient struct {
+type Ingredient struct {
 	Name  string `json:"ingredient_name" xml:"itemname"`
 	Count string `json:"ingredient_count" xml:"itemcount"`
 	Unit  string `json:"ingredient_unit,omitempty" xml:"itemunit"`
@@ -59,6 +60,10 @@ func (jr *JSONReader) OutputData() error {
 	return nil
 }
 
+func (jr *JSONReader) GetCakeData() []Cake {
+	return jr.Cakes.Cakes
+}
+
 type XMLReader struct {
 	Path  string
 	Cakes Cakes
@@ -87,6 +92,10 @@ func (xr *XMLReader) OutputData() error {
 	return nil
 }
 
+func (xr *XMLReader) GetCakeData() []Cake {
+	return xr.Cakes.Cakes
+}
+
 func OutputJsonXml(reader DBReader) {
 	switch r := reader.(type) {
 	case (*JSONReader):
@@ -99,15 +108,29 @@ func OutputJsonXml(reader DBReader) {
 }
 
 func ParseInput() (string, error) {
-	var path string
-	if len(os.Args) != 3 || os.Args[1] != "-f" {
-		return "", fmt.Errorf("usage: ./DBReader -f [filename xml or json]")
+	mode := "reader"
+
+	if ((len(os.Args) != 3) && len(os.Args) != 5) || !((os.Args[1] == "--old" && os.Args[3] == "--new") || (os.Args[1] == "--new" && os.Args[3] == "--old")) || (os.Args[1] == os.Args[3]) {
+		return "", fmt.Errorf(`usage: ./compareDB -f [filename xml or json]
+		or ./compareDB --[old/new] original_database.[xml/json] --[new/old] stolen_database.[json/xml]`)
 	}
-	path = os.Args[2]
+
+	path := os.Args[2]
 	if !strings.HasSuffix(path, ".xml") && !strings.HasSuffix(path, ".json") {
 		return "", fmt.Errorf("unknown file format")
 	}
-	return path, nil
+	if len(os.Args) == 5 {
+		path = os.Args[4]
+		if !strings.HasSuffix(path, ".xml") && !strings.HasSuffix(path, ".json") {
+			return "", fmt.Errorf("unknown file format")
+		}
+		if os.Args[1] == "--old" {
+			mode = "compare2to1"
+		} else {
+			mode = "compare1to2"
+		}
+	}
+	return mode, nil
 }
 
 func CreateReader(path string) DBReader {
