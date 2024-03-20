@@ -40,7 +40,7 @@ type JSONReader struct {
 func (jr *JSONReader) ReadData() error {
 	jsonFile, err := os.Open(jr.Path)
 	if err != nil {
-		return fmt.Errorf("error during file reading: %s", err)
+		return fmt.Errorf("error during file reading: %v", err)
 	}
 	defer jsonFile.Close()
 	byteValue, _ := io.ReadAll(jsonFile)
@@ -52,7 +52,7 @@ func (jr *JSONReader) ReadData() error {
 func (jr *JSONReader) OutputData() error {
 	out, err := json.MarshalIndent(jr.Cakes, "", "    ")
 	if err != nil {
-		return fmt.Errorf("error during OutputData: %s", err)
+		return fmt.Errorf("error during OutputData: %v", err)
 	}
 
 	fmt.Println(string(out))
@@ -72,7 +72,7 @@ type XMLReader struct {
 func (xr *XMLReader) ReadData() error {
 	xmlFile, err := os.Open(xr.Path)
 	if err != nil {
-		return fmt.Errorf("error during file reading: %s", err)
+		return fmt.Errorf("error during file reading: %v", err)
 	}
 	defer xmlFile.Close()
 	byteValue, _ := io.ReadAll(xmlFile)
@@ -84,7 +84,7 @@ func (xr *XMLReader) ReadData() error {
 func (xr *XMLReader) OutputData() error {
 	out, err := xml.MarshalIndent(xr.Cakes, "", "    ")
 	if err != nil {
-		return fmt.Errorf("error during OutputData: %s", err)
+		return fmt.Errorf("error during OutputData: %v", err)
 	}
 
 	fmt.Println(string(out))

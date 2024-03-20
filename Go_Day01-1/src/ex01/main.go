@@ -10,7 +10,7 @@ import (
 func main() {
 	mode, err := reader.ParseInput()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error during input parsing: %s\n", err)
+		fmt.Fprintf(os.Stderr, "Error during input parsing: %s\n", err.Error())
 		os.Exit(1)
 	}
 
@@ -20,13 +20,13 @@ func main() {
 		var dbreader reader.DBReader = reader.CreateReader(filePath)
 		err = dbreader.ReadData()
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error %s during reading file: %s\n", err, filePath)
+			fmt.Fprintf(os.Stderr, "Error %s during reading file: %s\n", err.Error(), filePath)
 			os.Exit(1)
 		}
 
 		err = dbreader.OutputData()
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error %s during marshalling file: %s\n", err, filePath)
+			fmt.Fprintf(os.Stderr, "Error %s during marshalling file: %s\n", err.Error(), filePath)
 			os.Exit(1)
 		}
 	case "compare2to1":
