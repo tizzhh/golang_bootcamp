@@ -1,9 +1,17 @@
 package main
 
 import (
+	"fmt"
 	"myFind/finder"
+	"os"
 )
 
 func main() {
-	finder.ParseInput()
+	inputData, err := finder.ParseInput()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error during input parsing: %s\n", err.Error())
+		os.Exit(1)
+	}
+	// fmt.Println(inputData)
+	finder.ReadDir(inputData)
 }
