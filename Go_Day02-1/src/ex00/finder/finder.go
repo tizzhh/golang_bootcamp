@@ -3,7 +3,6 @@ package finder
 import (
 	"fmt"
 	"os"
-	// "path/filepath"
 	"strings"
 )
 
@@ -78,15 +77,12 @@ func ReadSubdirs(paths, completeData *[]string, fld FlagData, path string) error
 		if file.IsDir() && fld.d {
 			*completeData = append(*completeData, new_dir)
 		} else if !file.IsDir() {
-			if fld.f {
-				if (fld.ext != "" && strings.HasSuffix(file.Name(), fld.ext)) || fld.ext == "" {
+			link, err := os.Readlink(new_dir)
+			if err != nil && fld.f {
+				if fld.f && (fld.ext != "" && strings.HasSuffix(file.Name(), fld.ext)) || fld.ext == "" {
 					*completeData = append(*completeData, new_dir)
 				}
 			} else if fld.sl {
-				link, err := os.Readlink(new_dir)
-				if err != nil {
-					continue
-				}
 				_, err = os.Stat(new_dir)
 				if err != nil {
 					*completeData = append(*completeData, new_dir+" -> [broken]")
