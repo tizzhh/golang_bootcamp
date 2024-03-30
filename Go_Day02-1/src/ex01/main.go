@@ -12,9 +12,14 @@ func main() {
 		fmt.Fprintf(os.Stderr, "error during input parsing: %s\n", err.Error())
 		os.Exit(1)
 	}
-	ch := make(chan int)
+	ch := make(chan wc.Wc)
 	for _, path := range paths {
 		go wc.WcCount(path, mode, ch)
-		fmt.Printf("%d\t%s\n", <-ch, path)
+		wcData := <-ch
+		if wcData.Err != nil {
+			fmt.Fprintf(os.Stderr, "Error during file reading: %s\n", wcData.Err.Error())
+		} else {
+			fmt.Printf("%d\t%s\n", wcData.Res, path)
+		}
 	}
 }

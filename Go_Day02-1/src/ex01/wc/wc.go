@@ -8,6 +8,11 @@ import (
 	"strings"
 )
 
+type Wc struct {
+	Err error
+	Res int
+}
+
 func ParseInput() (string, []string, error) {
 	if len(os.Args) < 2 {
 		return "", []string{}, fmt.Errorf("usage: ./myWc [-w -l -m] *file1* *file2* etc")
@@ -37,8 +42,12 @@ func ParseInput() (string, []string, error) {
 	return mode, paths, nil
 }
 
-func WcCount(path, mode string, ch chan int) {
-	file, _ := os.Open(path)
+func WcCount(path, mode string, ch chan Wc) {
+	file, err := os.Open(path)
+	if err != nil {
+		ch <- Wc{err, 0}
+		return
+	}
 	var result int
 	reader := bufio.NewReader(file)
 
@@ -75,5 +84,5 @@ func WcCount(path, mode string, ch chan int) {
 		}
 	}
 
-	ch <- result
+	ch <- Wc{nil, result}
 }
