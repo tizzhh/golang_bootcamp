@@ -15,7 +15,19 @@ func ParseInput() (string, []string, error) {
 	var mode string
 	var paths []string
 
-	if os.Args[1] != "-w" && os.Args[1] != "-l" && os.Args[1] != "-m" {
+	flag_found := false
+	for _, flag := range os.Args[1:] {
+		if flag_found && flag[0] == '-' {
+			return "", []string{}, fmt.Errorf("cannot specify multiple flags")
+		}
+		if flag[0] == '-' {
+			flag_found = true
+			if flag != "-w" && flag != "-l" && flag != "-m" {
+				return "", []string{}, fmt.Errorf("unknown flag")
+			}
+		}
+	}
+	if !flag_found {
 		mode = "-w"
 		paths = append(paths, os.Args[1:]...)
 	} else {
