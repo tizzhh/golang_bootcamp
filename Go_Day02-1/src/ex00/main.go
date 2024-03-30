@@ -12,6 +12,9 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Error during input parsing: %s\n", err.Error())
 		os.Exit(1)
 	}
-	// fmt.Println(inputData)
-	finder.MyFind(inputData)
+	err = finder.MyFind(inputData)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error during find: %s\n", err.Error())
+		os.Exit(1)
+	}
 }

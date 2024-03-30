@@ -33,6 +33,11 @@ func ParseInput() (FlagData, error) {
 			extfound = true
 		}
 	}
+
+	if fld.ext != "" && !fld.f {
+		return fld, fmt.Errorf("ext only works with -f specified")
+	}
+
 	fld.path = os.Args[len(os.Args)-1]
 
 	if !fld.d && !fld.f && !fld.sl {
@@ -58,7 +63,9 @@ func MyFind(fld FlagData) error {
 func ReadSubdirs(paths, completeData *[]string, fld FlagData, path string) error {
 	files, err := os.ReadDir(path)
 	if err != nil {
-		fmt.Println(path)
+		if os.IsPermission(err) {
+			return nil
+		}
 		return err
 	}
 	cur_dir, err := os.Getwd()
