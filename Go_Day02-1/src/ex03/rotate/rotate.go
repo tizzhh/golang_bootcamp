@@ -2,7 +2,7 @@ package rotate
 
 import (
 	"archive/tar"
-	"compress/gzip"
+	// "compress/gzip"
 	"fmt"
 	"io"
 	"os"
@@ -47,9 +47,9 @@ func Rotate(path, savingPath string, ch chan error) {
 	}
 	defer archive.Close()
 
-	gw := gzip.NewWriter(archive)
-	defer gw.Close()
-	tw := tar.NewWriter(gw)
+	// gw := gzip.NewWriter(archive)
+	// defer gw.Close()
+	tw := tar.NewWriter(archive)
 	defer tw.Close()
 
 	addToArchive(tw, path, ch)
@@ -76,7 +76,6 @@ func addToArchive(tw *tar.Writer, path string, ch chan error) {
 		return
 	}
 
-	header.Name = path
 	err = tw.WriteHeader(header)
 	if err != nil {
 		ch <- err
