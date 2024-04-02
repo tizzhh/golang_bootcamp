@@ -48,6 +48,7 @@ func WcCount(path, mode string, ch chan Wc) {
 		ch <- Wc{err, 0}
 		return
 	}
+	defer file.Close()
 	var result int
 	reader := bufio.NewReader(file)
 
