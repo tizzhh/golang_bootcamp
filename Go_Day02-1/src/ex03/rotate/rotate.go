@@ -2,7 +2,7 @@ package rotate
 
 import (
 	"archive/tar"
-	// "compress/gzip"
+	"compress/gzip"
 	"fmt"
 	"io"
 	"os"
@@ -19,6 +19,10 @@ func ParseInput() (string, []string, error) {
 	var savingPath string
 	if os.Args[1] == "-a" {
 		savingPath = os.Args[2]
+		dir, err := os.Stat(savingPath)
+		if err != nil || !dir.IsDir() {
+			return "", paths, fmt.Errorf("there should be a directory after -a")
+		}
 		paths = append(paths, os.Args[3:]...)
 	} else {
 		paths = append(paths, os.Args[1:]...)
@@ -28,6 +32,7 @@ func ParseInput() (string, []string, error) {
 }
 
 func Rotate(path, savingPath string, ch chan error) {
+	fmt.Println(path)
 	if !strings.HasSuffix(path, ".log") {
 		ch <- fmt.Errorf("%s not a log file", path)
 		return
@@ -39,7 +44,13 @@ func Rotate(path, savingPath string, ch chan error) {
 		return
 	}
 	mtime := stats.ModTime().Unix()
-	logPath := strings.TrimSuffix(path, ".log") + "_" + strconv.Itoa(int(mtime)) + ".tar.gz"
+	var logPath string
+	if savingPath == "" {
+		logPath = strings.TrimSuffix(path, ".log") + "_" + strconv.Itoa(int(mtime)) + ".tar.gz"
+	} else {
+		pathElems := strings.Split(path, "/")
+		logPath = savingPath + "/" + strings.TrimSuffix(pathElems[len(pathElems)-1], ".log") + "_" + strconv.Itoa(int(mtime)) + ".tar.gz"
+	}
 	archive, err := os.Create(logPath)
 	if err != nil {
 		ch <- err
@@ -47,10 +58,10 @@ func Rotate(path, savingPath string, ch chan error) {
 	}
 	defer archive.Close()
 
-	// gw := gzip.NewWriter(archive)
-	// defer gw.Close()
+	gw := gzip.NewWriter(archive)
 	tw := tar.NewWriter(archive)
 	defer tw.Close()
+	defer gw.Close()
 
 	addToArchive(tw, path, ch)
 	ch <- nil
@@ -87,6 +98,4 @@ func addToArchive(tw *tar.Writer, path string, ch chan error) {
 		ch <- err
 		return
 	}
-
-	ch <- nil
 }
