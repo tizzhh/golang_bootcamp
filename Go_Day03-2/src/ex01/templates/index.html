@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Places</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+<h5>Total: {{.TotalNumberOfRests}}</h5>
+{{range .}}
+<ul>
+    <li>
+        <div>{{.Name}}</div>
+        <div>{{.Address}}</div>
+        <div>{{.Phone}}</div>
+    </li>
+</ul>
+{{end}}
+{{if (ne .CurPage 1)}}
+<a href="/?page={{.CurPage - 1}}">Previous</a>
+{{end}}
+{{if (ne .CurPage .TotalPages)}}
+<a href="/?page={{.CurPage + 1}}">Next</a>
+<a href="/?page={{.TotalPages}}">Last</a>
+</body>
+</html>
