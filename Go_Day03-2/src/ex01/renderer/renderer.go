@@ -23,7 +23,7 @@ func RenderPage(w http.ResponseWriter, r *http.Request) {
 	pageNum := r.URL.Query().Get("page")
 	intPageNum, err := strconv.Atoi(pageNum)
 	if err != nil {
-		http.Error(w, "'page' param is not an int", http.StatusBadRequest)
+		http.Error(w, "'page' param is not an int: " + pageNum, http.StatusBadRequest)
 		return
 	}
 
