@@ -48,7 +48,7 @@ func (indx Indx) GetPlaces(limit int, offset int) ([]types.Place, int, error) {
 		}`, offset, limit)
 	res, err := es.Search(
 		es.Search.WithBody(strings.NewReader(query)),
-		es.Search.WithIndex("places"),
+		es.Search.WithIndex(string(indx)),
 		es.Search.WithPretty(),
 		es.Search.WithTrackTotalHits(true),
 	)

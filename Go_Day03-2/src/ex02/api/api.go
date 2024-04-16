@@ -18,6 +18,10 @@ type APIError struct {
 	Error string `json:"error"`
 }
 
+const (
+	PageSearchName string = "Places"
+)
+
 func JSONError(w http.ResponseWriter, err string, code int) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
@@ -54,7 +58,7 @@ func ApiResponse(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := APIResonse{Name: string(renderer.INDEXNAME), Total: totalEntries, Places: places}
+	response := APIResonse{Name: PageSearchName, Total: totalEntries, Places: places}
 
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	json.NewEncoder(w).Encode(response)
