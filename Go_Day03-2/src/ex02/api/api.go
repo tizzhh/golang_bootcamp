@@ -28,27 +28,24 @@ func JSONError(w http.ResponseWriter, err string, code int) {
 func ApiResponse(w http.ResponseWriter, r *http.Request) {
 	hasPage := r.URL.Query().Has("page")
 	if !hasPage {
-		// http.Error(w, "Missing 'page' param", http.StatusBadRequest)
 		JSONError(w, "Missing 'page' param", http.StatusBadRequest)
 		return
 	}
 	pageNum := r.URL.Query().Get("page")
 	intPageNum, err := strconv.Atoi(pageNum)
 	if err != nil {
-		// http.Error(w, "'page' param is not an int", http.StatusBadRequest)
 		JSONError(w, "'page' param is not an int: "+pageNum, http.StatusBadRequest)
 		return
 	}
 
 	if intPageNum < 1 {
-		// http.Error(w, "'page' param should be >= 1", http.StatusBadRequest)
 		JSONError(w, "'page' param should be >= 1", http.StatusBadRequest)
 		return
 	}
 
 	places, totalEntries, err := renderer.INDEXNAME.GetPlaces(renderer.PAGINATION_LIMIT, (intPageNum-1)*renderer.PAGINATION_LIMIT)
 	if err != nil {
-		JSONError(w, "Error during getting values "+err.Error(), http.StatusBadRequest)
+		JSONError(w, "Error during getting values: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 

@@ -10,6 +10,23 @@ import (
 	"github.com/elastic/go-elasticsearch/v8"
 )
 
+type Total struct {
+	Value int `json:"value"`
+}
+
+type Hit struct {
+	Source types.Place `json:"_source"`
+}
+
+type Hits struct {
+	Total Total `json:"total"`
+	Hits  []Hit `json:"hits"`
+}
+
+type OuterHits struct {
+	OuterHits Hits `json:"hits"`
+}
+
 type Store interface {
 	GetPlaces(limit int, offset int) ([]types.Place, int, error)
 }
@@ -17,10 +34,7 @@ type Store interface {
 type Indx string
 
 func (indx Indx) GetPlaces(limit int, offset int) ([]types.Place, int, error) {
-	var (
-		places      []types.Place
-		totalNumber int
-	)
+	var places []types.Place
 
 	es, err := elasticsearch.NewDefaultClient()
 	if err != nil {
@@ -38,70 +52,22 @@ func (indx Indx) GetPlaces(limit int, offset int) ([]types.Place, int, error) {
 		es.Search.WithPretty(),
 		es.Search.WithTrackTotalHits(true),
 	)
+	defer res.Body.Close()
 
 	if err != nil {
 		return nil, 0, fmt.Errorf("cannot complete search: %v", err)
 	}
 
-	var responseMap map[string]interface{}
-	if err := json.NewDecoder(res.Body).Decode(&responseMap); err != nil {
+	var hitsReponse OuterHits
+	if err := json.NewDecoder(res.Body).Decode(&hitsReponse); err != nil {
 		return nil, 0, fmt.Errorf("error decoding the response body: %v", err)
 	}
 
-	hits, ok := responseMap["hits"].(map[string]interface{})
-	if !ok {
-		return nil, 0, fmt.Errorf("'hits' missing in api response")
+	for _, place := range hitsReponse.OuterHits.Hits {
+		places = append(places, place.Source)
 	}
 
-	totalHits, ok := hits["total"].(map[string]interface{})
-	if !ok {
-		return nil, 0, fmt.Errorf("'total' missing in api response")
-	}
-
-	totalNum, ok := totalHits["value"].(float64)
-	if !ok {
-		return nil, 0, fmt.Errorf("'value' missing in api's total hits")
-	}
-
-	totalNumber = int(totalNum)
-
-	restPlaces, ok := hits["hits"].([]interface{})
-	if !ok {
-		return nil, 0, fmt.Errorf("'hits' missing in api's hits")
-	}
-
-	for _, place := range restPlaces {
-		placeData, ok := place.(map[string]interface{})
-		if !ok {
-			return nil, 0, fmt.Errorf("invalid hit data format")
-		}
-
-		sourcePlaceData, ok := placeData["_source"].(map[string]interface{})
-		if !ok {
-			return nil, 0, fmt.Errorf("'_source' missing in hit data")
-		}
-
-		name, ok := sourcePlaceData["name"].(string)
-		if !ok {
-			return nil, 0, fmt.Errorf("'name' invalid format")
-		}
-		address, ok := sourcePlaceData["address"].(string)
-		if !ok {
-			return nil, 0, fmt.Errorf("'address' invalid format")
-		}
-		phone, ok := sourcePlaceData["phone"].(string)
-		if !ok {
-			return nil, 0, fmt.Errorf("'phone' invalid format")
-		}
-		id, ok := sourcePlaceData["id"].(float64)
-		if !ok {
-			return nil, 0, fmt.Errorf("'id' invalid format")
-		}
-
-		places = append(places, types.Place{Name: name, Address: address, Phone: phone, Id: int(id)})
-	}
-
-	return places, totalNumber, nil
+	return places, hitsReponse.OuterHits.Total.Value, nil
 }
 
 func IncreaseMaxEntries() error {
