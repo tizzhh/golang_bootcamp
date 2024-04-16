@@ -9,7 +9,7 @@
 
 <body>
 <h5>Total: {{.TotalNumberOfRests}}</h5>
-{{range .}}
+{{range .Rests}}
 <ul>
     <li>
         <div>{{.Name}}</div>
@@ -19,10 +19,11 @@
 </ul>
 {{end}}
 {{if (ne .CurPage 1)}}
-<a href="/?page={{.CurPage - 1}}">Previous</a>
+<a href="/?page={{.PrevPage}}">Previous</a>
 {{end}}
 {{if (ne .CurPage .TotalPages)}}
-<a href="/?page={{.CurPage + 1}}">Next</a>
+<a href="/?page={{.NextPage}}">Next</a>
+{{end}}
 <a href="/?page={{.TotalPages}}">Last</a>
 </body>
 </html>

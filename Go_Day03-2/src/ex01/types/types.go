@@ -9,6 +9,8 @@ type Place struct {
 type RestPage struct {
 	TotalNumberOfRests int
 	CurPage            int
+	PrevPage           int
+	NextPage           int
 	TotalPages         int
 	Rests              []Place
 }

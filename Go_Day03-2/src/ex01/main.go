@@ -2,30 +2,29 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"searchRest/db"
-	"searchRest/types"
-	"strings"
-	"text/template"
+	"searchRest/renderer"
 )
 
-const INDEXNAME string = "places"
-
 func main() {
-	// es, err := elasticsearch.NewDefaultClient()
+	err := db.IncreaseMaxEntries()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error during max entry increasing: %s\n", err.Error())
+		os.Exit(1)
+	}
+	// places, totalEntries, err := INDEXNAME.GetPlaces(PAGINATION_LIMIT, 0)
 	// if err != nil {
-	// 	fmt.Errorf("error creating an Elasticsearch client: %v", err)
+	// 	fmt.Fprintf(os.Stderr, "Error during getting values: %s\n", err.Error())
 	// 	os.Exit(1)
 	// }
-	// res, err := es.Search(
-	// 	es.Search.WithBody(strings.NewReader(`
+	// fmt.Println(places, totalEntries)
+	http.HandleFunc("/", renderer.RenderPage)
 
-	// 	`)),
-	// 	es.Search.WithPretty(),
-	// )
-	// res, err := es.Get(
-	// 	INDEXNAME,
-	// 	idValue,
-	// 	es.Get.WithPretty(),
-	// )
+	err = http.ListenAndServe(":8888", nil)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%s\n", err.Error())
+		panic(err)
+	}
 }
