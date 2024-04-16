@@ -27,9 +27,19 @@ func RenderPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if intPageNum < 1 {
+		http.Error(w, "'page' param should be >= 1", http.StatusBadRequest)
+		return
+	}
+
 	places, totalEntries, err := INDEXNAME.GetPlaces(PAGINATION_LIMIT, (intPageNum-1)*PAGINATION_LIMIT)
 	if err != nil {
 		http.Error(w, "Error during getting values "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if intPageNum > totalEntries/PAGINATION_LIMIT+1 {
+		http.Error(w, "'page' param exceeds max number of pages", http.StatusBadRequest)
 		return
 	}
 
