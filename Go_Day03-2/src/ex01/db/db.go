@@ -11,13 +11,11 @@ import (
 )
 
 type Store interface {
-	// returns a list of items, a total number of hits and (or) an error in case of one
 	GetPlaces(limit int, offset int) ([]types.Place, int, error)
 }
 
 type Indx string
 
-// я не понимаю, какой ресивер тут нужен вообще лол
 func (indx Indx) GetPlaces(limit int, offset int) ([]types.Place, int, error) {
 	var (
 		places      []types.Place
@@ -95,8 +93,12 @@ func (indx Indx) GetPlaces(limit int, offset int) ([]types.Place, int, error) {
 		if !ok {
 			return nil, 0, fmt.Errorf("'phone' invalid format")
 		}
+		id, ok := sourcePlaceData["id"].(float64)
+		if !ok {
+			return nil, 0, fmt.Errorf("'id' invalid format")
+		}
 
-		places = append(places, types.Place{Name: name, Address: address, Phone: phone})
+		places = append(places, types.Place{Name: name, Address: address, Phone: phone, Id: int(id)})
 	}
 
 	return places, totalNumber, nil

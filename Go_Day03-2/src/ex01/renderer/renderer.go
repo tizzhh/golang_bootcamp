@@ -38,7 +38,7 @@ func RenderPage(w http.ResponseWriter, r *http.Request) {
 		CurPage:            (intPageNum),
 		PrevPage:           (intPageNum - 1),
 		NextPage:           (intPageNum + 1),
-		TotalPages:         totalEntries / PAGINATION_LIMIT,
+		TotalPages:         totalEntries/PAGINATION_LIMIT + 1,
 		Rests:              places,
 	}
 
