@@ -3,7 +3,7 @@
 all: run
 
 run: vet
-	go run cmd/candy-server-server/main.go  --tls-port 3333 --tls-key cert/key.pem --tls-certificate cert/cert.pem --tls-ca cert/minica.pem --host candy.tld
+	go run cmd/candy-server-server/main.go  --tls-port 3333 --tls-key cert/client/key.pem --tls-certificate cert/client/cert.pem --tls-ca cert/minica.pem --host candy.tld
 
 fmt:
 	go fmt ./...

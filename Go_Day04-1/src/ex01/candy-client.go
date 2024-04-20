@@ -27,8 +27,8 @@ const (
 )
 
 const (
-	CERT_PATH string = "cert/cert.pem"
-	KEY_PATH  string = "cert/key.pem"
+	CERT_PATH string = "cert/client/cert.pem"
+	KEY_PATH  string = "cert/client/key.pem"
 	CA_PATH   string = "cert/minica.pem"
 )
 
