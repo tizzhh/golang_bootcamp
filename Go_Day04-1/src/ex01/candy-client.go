@@ -27,9 +27,9 @@ const (
 )
 
 const (
-	CERT_PATH string = "candy.tld/cert.pem"
-	KEY_PATH  string = "candy.tld/key.pem"
-	CA_PATH   string = "minica.pem"
+	CERT_PATH string = "cert/cert.pem"
+	KEY_PATH  string = "cert/key.pem"
+	CA_PATH   string = "cert/minica.pem"
 )
 
 var candyCount = flag.Int64("c", -420, "Amount of candy")
