@@ -31,22 +31,22 @@ char *ask_cow(char phrase[]) {
   return buf;
 }
 
-int main(int argc, char *argv[]) {
-  for (i = 1; i < argc; ++i) {
-    argscharcount += (strlen(argv[i]) + 1);
-  }
-  argscharcount = argscharcount + 1;
+// int main(int argc, char *argv[]) {
+//   for (i = 1; i < argc; ++i) {
+//     argscharcount += (strlen(argv[i]) + 1);
+//   }
+//   argscharcount = argscharcount + 1;
 
-  char *phrase = (char *)malloc(sizeof(char) * argscharcount);
-  strcpy(phrase, argv[1]);
+//   char *phrase = (char *)malloc(sizeof(char) * argscharcount);
+//   strcpy(phrase, argv[1]);
 
-  for (i = 2; i < argc; ++i) {
-    strcat(phrase, " ");
-    strcat(phrase, argv[i]);
-  }
-  char *cow = ask_cow(phrase);
-  printf("%s", cow);
-  free(phrase);
-  free(cow);
-  return 0;
-}
+//   for (i = 2; i < argc; ++i) {
+//     strcat(phrase, " ");
+//     strcat(phrase, argv[i]);
+//   }
+//   char *cow = ask_cow(phrase);
+//   printf("%s", cow);
+//   free(phrase);
+//   free(cow);
+//   return 0;
+// }
