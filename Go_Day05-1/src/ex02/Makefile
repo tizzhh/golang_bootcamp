@@ -11,9 +11,8 @@ vet: fmt
 build: vet
 	go build
 
-# test: vet
-# 	go test -v toy_tree/toy_tree_test.go
-# 	go test -v queue/queue_test.go
+test: vet
+	go test -v present_heap/present_heap_test.go
 
 clean:
 	go clean

@@ -1,6 +1,9 @@
 package presentHeap
 
-import "container/heap"
+import (
+	"container/heap"
+	"fmt"
+)
 
 type Present struct {
 	Value, Size int
@@ -16,7 +19,7 @@ func (ph PresentHeap) Less(i, j int) bool {
 	if ph[i].Value == ph[j].Value {
 		return ph[i].Size < ph[j].Size
 	}
-	return ph[i].Value > ph[j].Value
+	return ph[i].Value >= ph[j].Value
 }
 
 func (ph PresentHeap) Swap(i, j int) {
@@ -35,21 +38,22 @@ func (ph *PresentHeap) Pop() interface{} {
 	return pr
 }
 
-func BuildHeapByPush(arr []Present) *PresentHeap {
+func BuildHeap(arr []Present) *PresentHeap {
 	res := &PresentHeap{}
-	for _, elem := range arr {
-		heap.Push(res, elem)
+	for _, present := range arr {
+		heap.Push(res, present)
 	}
 	return res
 }
 
-func GetNCoolestPresents(prArr []Present, n int) []Present {
-	prHeap := BuildHeapByPush(prArr)
-	var res []Present
-	for _, present := range *prHeap {
-		if present.Value == n {
-			res = append(res, present)
-		}
+func GetNCoolestPresents(prArr []Present, n int) ([]Present, error) {
+	if n < 0 || n > len(prArr) {
+		return nil, fmt.Errorf("n should be in [0; len(arr)], got: %d", n)
 	}
-	return res
+	prHeap := BuildHeap(prArr)
+	res := make([]Present, n)
+	for i := 0; i < n; i++ {
+		res[i] = (*prHeap)[i]
+	}
+	return res, nil
 }
