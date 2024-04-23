@@ -72,16 +72,15 @@ func (a *App) InitRoutes() {
 }
 
 func (a *App) GetArticles(w http.ResponseWriter, r *http.Request) {
-	hasPage := r.URL.Query().Has("page")
-	if !hasPage {
-		RespondWithError(w, "Missing 'page' param", http.StatusBadRequest)
-		return
-	}
 	pageNum := r.URL.Query().Get("page")
 	intPageNum, err := strconv.Atoi(pageNum)
 	if err != nil {
-		RespondWithError(w, "Page should be an int: "+pageNum, http.StatusBadRequest)
-		return
+		if !r.URL.Query().Has("page") {
+			intPageNum = 1
+		} else {
+			RespondWithError(w, "Page should be an int: "+pageNum, http.StatusBadRequest)
+			return
+		}
 	}
 	if intPageNum < 1 || intPageNum > (a.DB.TotalArticles/PAGE_LIMIT+1) {
 		RespondWithError(w, "Page should be in [1; maxPages]", http.StatusBadRequest)
