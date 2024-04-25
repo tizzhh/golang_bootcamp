@@ -14,6 +14,7 @@ import (
 const (
 	INDEX_TEMPLATE_PATH   string = "templates/index.html"
 	ARTICLE_TEMPLATE_PATH string = "templates/article.html"
+	BASE_TEMPLATE_PATH    string = "templates/base.html"
 )
 
 func RenderIndexArticles(w http.ResponseWriter, articles []types.ArticleData, curPage, totalPages int) error {
@@ -24,7 +25,7 @@ func RenderIndexArticles(w http.ResponseWriter, articles []types.ArticleData, cu
 		TotalPages: totalPages,
 		Articles:   articles,
 	}
-	tmpl, err := template.ParseFiles(INDEX_TEMPLATE_PATH)
+	tmpl, err := template.ParseFiles(BASE_TEMPLATE_PATH, INDEX_TEMPLATE_PATH)
 	if err != nil {
 		return fmt.Errorf("error during template creation: " + err.Error())
 	}
@@ -49,7 +50,7 @@ func RenderArticle(w http.ResponseWriter, article types.ArticleData, prevPageNum
 		},
 		PrevPageNum: prevPageNum,
 	}
-	tmpl, err := template.ParseFiles(ARTICLE_TEMPLATE_PATH)
+	tmpl, err := template.ParseFiles(BASE_TEMPLATE_PATH, ARTICLE_TEMPLATE_PATH)
 	if err != nil {
 		return fmt.Errorf("error during template creation: " + err.Error())
 	}

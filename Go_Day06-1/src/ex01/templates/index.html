@@ -1,65 +1,30 @@
-<!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <title>Places</title>
-        <link rel="icon" type="image/x-icon" href="/images/amazing_logo.png">
-        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-        <style>
-            body {
-                padding: 20px;
-            }
-            
-            h3 {
-                text-align: center;
-            }
-            
-            .post-date {
-                font-size: 14px;
-                font-weight: bold;
-            }
-            
-            .title {
-                font-size: 18px;
-                font-weight: bold;
-            }
-
-            .text {
-                font-size: 16px;
-            }
-        </style>
-    </head>
-    <body>
-        <h3>TeaWithMilkAndSugar's ☕ Articles</h3>
-        {{range .Articles}}
-        <div class="card my-3">
-            <div class="card-body">
-                <p class="post-date">{{.PostDate}}</p>
-                <h5 class="title">{{.Title}}</h5>
-                <p class="text">{{.Text}}</p>
-                <a class="page-link" href="/article/{{.Id}}">Read more</a>
-                <input type="hidden" value="{{.Id}}">
-            </div>
+{{define "body"}}
+    <h3>TeaWithMilkAndSugar's ☕ Articles</h3>
+    {{range .Articles}}
+    <div class="card my-3">
+        <div class="card-body">
+            <p class="post-date">{{.PostDate}}</p>
+            <h5 class="title">{{.Title}}</h5>
+            <p class="text">{{.Text}}</p>
+            <a class="page-link" href="/article/{{.Id}}">Read more</a>
+            <input type="hidden" value="{{.Id}}">
         </div>
-        {{end}}
-        <nav aria-label="Page navigation">
-            <ul class="pagination justify-content-center">
-                {{if (ne .CurPage 1)}}
-                <li class="page-item"><a class="page-link" href="/article?page=1">First</a></li>
-                {{end}}
-                {{if (ne .CurPage 1)}}
-                <li class="page-item"><a class="page-link" href="/article?page={{.PrevPage}}">Previous</a></li>
-                {{end}}
-                {{if (ne .CurPage .TotalPages)}}
-                <li class="page-item"><a class="page-link" href="/article?page={{.NextPage}}">Next</a></li>
-                {{end}}
-                {{if (ne .CurPage .TotalPages)}}
-                <li class="page-item"><a class="page-link" href="/article?page={{.TotalPages}}">Last</a></li>
-                {{end}}
-            </ul>
-        </nav>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.slim.min.js"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-    </body>
-</html>
+    </div>
+    {{end}}
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            {{if (ne .CurPage 1)}}
+            <li class="page-item"><a class="page-link" href="/article?page=1">First</a></li>
+            {{end}}
+            {{if (ne .CurPage 1)}}
+            <li class="page-item"><a class="page-link" href="/article?page={{.PrevPage}}">Previous</a></li>
+            {{end}}
+            {{if (ne .CurPage .TotalPages)}}
+            <li class="page-item"><a class="page-link" href="/article?page={{.NextPage}}">Next</a></li>
+            {{end}}
+            {{if (ne .CurPage .TotalPages)}}
+            <li class="page-item"><a class="page-link" href="/article?page={{.TotalPages}}">Last</a></li>
+            {{end}}
+        </ul>
+    </nav>
+{{end}}
