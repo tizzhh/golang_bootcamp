@@ -9,10 +9,13 @@ vet: fmt
 	go vet ./...
 
 build: vet
-	go build && ./myArticles
+	go build && ./logoGen
 
 test: vet
 	go test -v
+
+test2: vet
+	go test -v -run "\W*2"
 
 clean:
 	go clean
