@@ -92,9 +92,11 @@ func (a *App) adminAddArticleHandler(w http.ResponseWriter, r *http.Request) {
 	c, err := r.Cookie("token")
 	if err != nil {
 		if err == http.ErrNoCookie {
+			log.Println("No token")
 			RespondWithError(w, "No token", http.StatusUnauthorized)
 			return
 		}
+		log.Println(err.Error())
 		RespondWithError(w, "", http.StatusBadRequest)
 		return
 	}
@@ -106,10 +108,12 @@ func (a *App) adminAddArticleHandler(w http.ResponseWriter, r *http.Request) {
 	})
 	if err != nil {
 		if err == jwt.ErrSignatureInvalid {
+			log.Println("Wrong token")
 			RespondWithError(w, "Wrong token", http.StatusUnauthorized)
 			return
 		}
-		RespondWithError(w, "Wrong token: "+err.Error(), http.StatusBadRequest)
+		log.Println(err.Error())
+		RespondWithError(w, "Wrong token", http.StatusBadRequest)
 		return
 	}
 	if !tkn.Valid {
@@ -118,7 +122,7 @@ func (a *App) adminAddArticleHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == "GET" {
-		err = renderer.RenderAddArticleForm(w, 0)
+		err = renderer.RenderAddArticleForm(w, 0, http.StatusOK)
 		if err != nil {
 			log.Println("Error rendering article form with GET: ", err.Error())
 			RespondWithError(w, "Server error", http.StatusInternalServerError)
@@ -127,16 +131,18 @@ func (a *App) adminAddArticleHandler(w http.ResponseWriter, r *http.Request) {
 	} else if r.Method == "POST" {
 		err := r.ParseForm()
 		if err != nil {
-			RespondWithError(w, "Failed to parse form: "+err.Error(), http.StatusBadRequest)
+			log.Println(err.Error())
+			RespondWithError(w, "Failed to parse form", http.StatusBadRequest)
 			return
 		}
 		id, err := a.DB.CreateArticle(r.Form.Get("title"), r.Form.Get("content"))
 		if err != nil {
-			RespondWithError(w, "Failed to create a new article: "+err.Error(), http.StatusInternalServerError)
+			log.Println(err.Error())
+			RespondWithError(w, "Failed to create a new article", http.StatusInternalServerError)
 			return
 		}
 		a.DB.GetTotalNumOfArticles()
-		err = renderer.RenderAddArticleForm(w, id)
+		err = renderer.RenderAddArticleForm(w, id, http.StatusCreated)
 		if err != nil {
 			log.Println("Error rendering article form with POST: ", err.Error())
 			RespondWithError(w, "Server error", http.StatusInternalServerError)
@@ -149,13 +155,15 @@ func (a *App) adminLogInHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		err := renderer.RenderAdminLogInForm(w)
 		if err != nil {
-			RespondWithError(w, err.Error(), http.StatusInternalServerError)
+			log.Println(err.Error())
+			RespondWithError(w, "", http.StatusInternalServerError)
 			return
 		}
 	} else if r.Method == "POST" {
 		err := r.ParseForm()
 		if err != nil {
-			RespondWithError(w, "Failed to parse form: "+err.Error(), http.StatusBadRequest)
+			log.Println(err.Error())
+			RespondWithError(w, "Failed to parse form", http.StatusBadRequest)
 			return
 		}
 		username := r.Form.Get("username")
@@ -174,6 +182,7 @@ func (a *App) adminLogInHandler(w http.ResponseWriter, r *http.Request) {
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 		tokenStr, err := token.SignedString(jwtKey)
 		if err != nil {
+			log.Println(err.Error())
 			RespondWithError(w, "Token error", http.StatusInternalServerError)
 			return
 		}
@@ -192,7 +201,7 @@ func (a *App) getArticleHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
-		RespondWithError(w, "Ivalid article id", http.StatusBadRequest)
+		RespondWithError(w, "Ivalid article id: "+vars["id"], http.StatusBadRequest)
 		return
 	}
 	article, err := a.DB.GetArticle(id)
@@ -201,7 +210,8 @@ func (a *App) getArticleHandler(w http.ResponseWriter, r *http.Request) {
 		case pgx.ErrNoRows:
 			RespondWithError(w, "Article not found", http.StatusNotFound)
 		default:
-			RespondWithError(w, err.Error(), http.StatusBadRequest)
+			log.Println(err.Error())
+			RespondWithError(w, "", http.StatusBadRequest)
 		}
 		return
 	}

@@ -21,6 +21,7 @@ const (
 )
 
 func RenderError(w http.ResponseWriter, code int, msg string) error {
+	w.WriteHeader(code)
 	pageData := types.ErrorData{
 		Code:    code,
 		Message: msg,
@@ -97,7 +98,8 @@ func RenderAdminLogInForm(w http.ResponseWriter) error {
 	return nil
 }
 
-func RenderAddArticleForm(w http.ResponseWriter, id int) error {
+func RenderAddArticleForm(w http.ResponseWriter, id, code int) error {
+	w.WriteHeader(code)
 	tmpl, err := template.ParseFiles(BASE_TEMPLATE_PATH, ADD_ARTICLE_FORM)
 	if err != nil {
 		return fmt.Errorf("error during template creation: " + err.Error())
