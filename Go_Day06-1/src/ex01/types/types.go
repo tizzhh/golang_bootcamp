@@ -27,10 +27,5 @@ type ArticlesPage struct {
 
 type ArticlePage struct {
 	Article     ArticleData
-	PrevPageNum string
+	PrevPageNum int
 }
-
-// type Claims struct {
-// 	Username string `json:"username"`
-// 	jwt.RegisteredClaims
-// }

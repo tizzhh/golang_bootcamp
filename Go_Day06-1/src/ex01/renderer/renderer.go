@@ -17,6 +17,7 @@ const (
 	BASE_TEMPLATE_PATH    string = "templates/base.html"
 	ERROR_TEMPLATE_PATH   string = "templates/error.html"
 	ADMIN_LOGIN_PATH      string = "templates/log_in_form.html"
+	ADD_ARTICLE_FORM      string = "templates/create_article.html"
 )
 
 func RenderError(w http.ResponseWriter, code int, msg string) error {
@@ -57,7 +58,7 @@ func RenderIndexArticles(w http.ResponseWriter, articles []types.ArticleData, cu
 	return nil
 }
 
-func RenderArticle(w http.ResponseWriter, article types.ArticleData, prevPageNum string) error {
+func RenderArticle(w http.ResponseWriter, article types.ArticleData, prevPageNum int) error {
 	article.Text = template.HTML(mdToHtml([]byte(article.Text)))
 
 	pageData := types.ArticlePage{
@@ -89,6 +90,20 @@ func RenderAdminLogInForm(w http.ResponseWriter) error {
 	}
 
 	err = tmpl.Execute(w, "")
+	if err != nil {
+		return fmt.Errorf("error during template populating: " + err.Error())
+	}
+
+	return nil
+}
+
+func RenderAddArticleForm(w http.ResponseWriter, id int) error {
+	tmpl, err := template.ParseFiles(BASE_TEMPLATE_PATH, ADD_ARTICLE_FORM)
+	if err != nil {
+		return fmt.Errorf("error during template creation: " + err.Error())
+	}
+
+	err = tmpl.Execute(w, id)
 	if err != nil {
 		return fmt.Errorf("error during template populating: " + err.Error())
 	}

@@ -53,7 +53,7 @@ func (pg *Postgres) GetArticle(id int) (types.ArticleData, error) {
 }
 
 func (pg *Postgres) GetArticles(limit, offset int) ([]types.ArticleData, error) {
-	rows, err := getRows(pg, fmt.Sprintf(`SELECT * FROM article WHERE id > %d LIMIT %d`, offset, limit))
+	rows, err := getRows(pg, fmt.Sprintf(`SELECT * FROM article OFFSET %d LIMIT %d`, offset, limit))
 	if err != nil {
 		return nil, err
 	}
@@ -73,6 +73,16 @@ func (pg *Postgres) GetArticles(limit, offset int) ([]types.ArticleData, error) 
 	}
 
 	return articles, nil
+}
+
+func (pg *Postgres) CreateArticle(title, text string) (int, error) {
+	var id int
+	err := pg.Db.QueryRow(context.Background(), fmt.Sprintf(`INSERT INTO article (title, article_text) VALUES ('%s', '%s') RETURNING id`, title, text)).Scan(&id)
+	if err != nil {
+		return 0, fmt.Errorf("unable to create an article: %w", err)
+	}
+
+	return id, nil
 }
 
 func (pg *Postgres) GetTotalNumOfArticles() error {

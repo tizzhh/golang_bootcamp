@@ -117,7 +117,32 @@ func (a *App) adminAddArticleHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write([]byte(fmt.Sprintf("Welcome %s!", claims["username"])))
+	if r.Method == "GET" {
+		err = renderer.RenderAddArticleForm(w, 0)
+		if err != nil {
+			log.Println("Error rendering article form with GET: ", err.Error())
+			RespondWithError(w, "Server error", http.StatusInternalServerError)
+			return
+		}
+	} else if r.Method == "POST" {
+		err := r.ParseForm()
+		if err != nil {
+			RespondWithError(w, "Failed to parse form: "+err.Error(), http.StatusBadRequest)
+			return
+		}
+		id, err := a.DB.CreateArticle(r.Form.Get("title"), r.Form.Get("content"))
+		if err != nil {
+			RespondWithError(w, "Failed to create a new article: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+		a.DB.GetTotalNumOfArticles()
+		err = renderer.RenderAddArticleForm(w, id)
+		if err != nil {
+			log.Println("Error rendering article form with POST: ", err.Error())
+			RespondWithError(w, "Server error", http.StatusInternalServerError)
+			return
+		}
+	}
 }
 
 func (a *App) adminLogInHandler(w http.ResponseWriter, r *http.Request) {
@@ -180,8 +205,11 @@ func (a *App) getArticleHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+	pageNum := 1
 	refererPage := r.Header.Get("Referer")
-	pageNum := strings.Split(refererPage, "?page=")[1]
+	if strings.Contains(refererPage, "?page=") {
+		pageNum, _ = strconv.Atoi(strings.Split(refererPage, "?page=")[1])
+	}
 	err = renderer.RenderArticle(w, article, pageNum)
 	if err != nil {
 		log.Println("Error rendering article with GET: ", err.Error())
