@@ -17,6 +17,10 @@ var (
 	pgInstance *Postgres
 )
 
+const (
+	MAX_LEN_OF_TEXT int = 50
+)
+
 func NewPG(ctx context.Context, connString string) (*Postgres, error) {
 	var err error = nil
 	conn, err := pgx.Connect(ctx, connString)
@@ -26,6 +30,26 @@ func NewPG(ctx context.Context, connString string) (*Postgres, error) {
 	pgInstance = &Postgres{conn, 0}
 
 	return pgInstance, nil
+}
+
+func (pg *Postgres) GetArticle(id int) (types.ArticleData, error) {
+	var article types.ArticleData
+	rows, err := getRows(pg, fmt.Sprintf(`SELECT * FROM article WHERE id = %d`, id))
+	if err != nil {
+		return article, err
+	}
+	defer rows.Close()
+
+	if !rows.Next() {
+		return article, pgx.ErrNoRows
+	}
+
+	err = rows.Scan(&article.Id, &article.PostDate, &article.Title, &article.Text)
+	if err != nil {
+		return article, fmt.Errorf("unable to scan row: %w", err)
+	}
+
+	return article, nil
 }
 
 func (pg *Postgres) GetArticles(limit, offset int) ([]types.ArticleData, error) {
@@ -41,6 +65,9 @@ func (pg *Postgres) GetArticles(limit, offset int) ([]types.ArticleData, error) 
 		err := rows.Scan(&article.Id, &article.PostDate, &article.Title, &article.Text)
 		if err != nil {
 			return nil, fmt.Errorf("unable to scan row: %w", err)
+		}
+		if len(article.Text) >= MAX_LEN_OF_TEXT {
+			article.Text = article.Text[:MAX_LEN_OF_TEXT] + "..."
 		}
 		articles = append(articles, article)
 	}

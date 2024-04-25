@@ -9,10 +9,15 @@ type ArticleData struct {
 	Text     string    `json:"article_text"`
 }
 
-type ArticlePage struct {
+type ArticlesPage struct {
 	CurPage    int
 	PrevPage   int
 	NextPage   int
 	TotalPages int
 	Articles   []ArticleData
+}
+
+type ArticlePage struct {
+	Article     ArticleData
+	PrevPageNum string
 }

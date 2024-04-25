@@ -14,11 +14,13 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/jackc/pgx/v5"
 )
 
 const (
 	PAGE_LIMIT       int    = 3
 	CREDENTIALS_PATH string = "admin_credentials.txt"
+	FAVICON_PATH     string = "images/amazing_logo.png"
 )
 
 type Config struct {
@@ -69,6 +71,40 @@ func (a *App) Run() {
 
 func (a *App) InitRoutes() {
 	a.Router.HandleFunc("/", a.GetArticles).Methods("GET")
+	a.Router.HandleFunc("/article", a.GetArticles).Methods("GET")
+	a.Router.HandleFunc("/article/{id:[0-9]+}", a.GetArticle).Methods("GET")
+	a.Router.HandleFunc("/"+FAVICON_PATH, faviconHandler).Methods("GET")
+}
+
+func faviconHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, FAVICON_PATH)
+}
+
+func (a *App) GetArticle(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		RespondWithError(w, "Ivalid article id", http.StatusBadRequest)
+		return
+	}
+	article, err := a.DB.GetArticle(id)
+	if err != nil {
+		switch err {
+		case pgx.ErrNoRows:
+			RespondWithError(w, "Article not found", http.StatusNotFound)
+		default:
+			RespondWithError(w, err.Error(), http.StatusBadRequest)
+		}
+		return
+	}
+	refererPage := r.Header.Get("Referer")
+	pageNum := strings.Split(refererPage, "?page=")[1]
+	err = renderer.RenderArticle(w, article, pageNum)
+	if err != nil {
+		log.Println("Error rendering article with GET: ", err.Error())
+		RespondWithError(w, "Server error", http.StatusBadGateway)
+		return
+	}
 }
 
 func (a *App) GetArticles(w http.ResponseWriter, r *http.Request) {
@@ -93,7 +129,7 @@ func (a *App) GetArticles(w http.ResponseWriter, r *http.Request) {
 		RespondWithError(w, "Server error", http.StatusBadGateway)
 		return
 	}
-	err = renderer.GetIndexArticles(w, articles, intPageNum, a.DB.TotalArticles/PAGE_LIMIT+1)
+	err = renderer.RenderIndexArticles(w, articles, intPageNum, a.DB.TotalArticles/PAGE_LIMIT+1)
 	if err != nil {
 		log.Println("Error rendering index with GET: ", err.Error())
 		RespondWithError(w, "Server error", http.StatusBadGateway)
