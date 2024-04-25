@@ -13,6 +13,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
 	"github.com/jackc/pgx/v5"
 )
@@ -30,7 +31,10 @@ type Config struct {
 type App struct {
 	Router *mux.Router
 	DB     *db.Postgres
+	Cfg    Config
 }
+
+var jwtKey = []byte("my_secret_key")
 
 func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Second*3))
@@ -43,7 +47,7 @@ func main() {
 	}
 
 	var app App
-	err = app.Init(ctx, URL)
+	err = app.Init(ctx, URL, cfg)
 	if err != nil {
 		log.Fatalf("Error during initialization: %s\n", err.Error())
 	}
@@ -64,7 +68,7 @@ func (a *App) InitRoutes() {
 	a.Router.HandleFunc("/admin/add_article", a.adminAddArticleHandler).Methods("GET", "POST")
 }
 
-func (a *App) Init(ctx context.Context, URL string) error {
+func (a *App) Init(ctx context.Context, URL string, cfg Config) error {
 	db, err := db.NewPG(ctx, URL)
 	if err != nil {
 		log.Fatalf("Error during connection creation: %s\n", err.Error())
@@ -75,6 +79,8 @@ func (a *App) Init(ctx context.Context, URL string) error {
 	a.Router = mux.NewRouter()
 	a.InitRoutes()
 
+	a.Cfg = cfg
+
 	return nil
 }
 
@@ -83,11 +89,78 @@ func faviconHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *App) adminAddArticleHandler(w http.ResponseWriter, r *http.Request) {
+	c, err := r.Cookie("token")
+	if err != nil {
+		if err == http.ErrNoCookie {
+			RespondWithError(w, "No token", http.StatusUnauthorized)
+			return
+		}
+		RespondWithError(w, "", http.StatusBadRequest)
+		return
+	}
 
+	token := c.Value
+	claims := jwt.MapClaims{}
+	tkn, err := jwt.ParseWithClaims(token, claims, func(t *jwt.Token) (interface{}, error) {
+		return jwtKey, nil
+	})
+	if err != nil {
+		if err == jwt.ErrSignatureInvalid {
+			RespondWithError(w, "Wrong token", http.StatusUnauthorized)
+			return
+		}
+		RespondWithError(w, "Wrong token: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+	if !tkn.Valid {
+		RespondWithError(w, "Wrong token", http.StatusUnauthorized)
+		return
+	}
+
+	w.Write([]byte(fmt.Sprintf("Welcome %s!", claims["username"])))
 }
 
 func (a *App) adminLogInHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		err := renderer.RenderAdminLogInForm(w)
+		if err != nil {
+			RespondWithError(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	} else if r.Method == "POST" {
+		err := r.ParseForm()
+		if err != nil {
+			RespondWithError(w, "Failed to parse form: "+err.Error(), http.StatusBadRequest)
+			return
+		}
+		username := r.Form.Get("username")
+		password := r.Form.Get("password")
 
+		if a.Cfg.adminPass != password || a.Cfg.adminUser != username {
+			RespondWithError(w, "Wrong username and/or password", http.StatusUnauthorized)
+			return
+		}
+
+		expirationDate := time.Now().Add(24 * time.Hour)
+		claims := jwt.MapClaims{
+			"exp":      expirationDate.Unix(),
+			"username": username,
+		}
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+		tokenStr, err := token.SignedString(jwtKey)
+		if err != nil {
+			RespondWithError(w, "Token error", http.StatusInternalServerError)
+			return
+		}
+
+		http.SetCookie(w, &http.Cookie{
+			Name:    "token",
+			Value:   tokenStr,
+			Expires: expirationDate,
+		})
+
+		http.Redirect(w, r, "/admin/add_article", http.StatusSeeOther)
+	}
 }
 
 func (a *App) getArticleHandler(w http.ResponseWriter, r *http.Request) {
@@ -112,7 +185,7 @@ func (a *App) getArticleHandler(w http.ResponseWriter, r *http.Request) {
 	err = renderer.RenderArticle(w, article, pageNum)
 	if err != nil {
 		log.Println("Error rendering article with GET: ", err.Error())
-		RespondWithError(w, "Server error", http.StatusBadGateway)
+		RespondWithError(w, "Server error", http.StatusInternalServerError)
 		return
 	}
 }
@@ -136,13 +209,13 @@ func (a *App) getArticlesHandler(w http.ResponseWriter, r *http.Request) {
 	articles, err := a.DB.GetArticles(PAGE_LIMIT, offset)
 	if err != nil {
 		log.Println("Error during db query", err.Error())
-		RespondWithError(w, "Server error", http.StatusBadGateway)
+		RespondWithError(w, "Server error", http.StatusInternalServerError)
 		return
 	}
 	err = renderer.RenderIndexArticles(w, articles, intPageNum, (a.DB.TotalArticles-1)/PAGE_LIMIT+1)
 	if err != nil {
 		log.Println("Error rendering index with GET: ", err.Error())
-		RespondWithError(w, "Server error", http.StatusBadGateway)
+		RespondWithError(w, "Server error", http.StatusInternalServerError)
 		return
 	}
 }
@@ -150,7 +223,7 @@ func (a *App) getArticlesHandler(w http.ResponseWriter, r *http.Request) {
 func RespondWithError(w http.ResponseWriter, message string, code int) {
 	err := renderer.RenderError(w, code, message)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadGateway)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 

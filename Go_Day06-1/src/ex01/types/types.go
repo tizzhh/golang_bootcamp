@@ -29,3 +29,8 @@ type ArticlePage struct {
 	Article     ArticleData
 	PrevPageNum string
 }
+
+// type Claims struct {
+// 	Username string `json:"username"`
+// 	jwt.RegisteredClaims
+// }

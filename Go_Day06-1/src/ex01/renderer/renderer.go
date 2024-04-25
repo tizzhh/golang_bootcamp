@@ -16,6 +16,7 @@ const (
 	ARTICLE_TEMPLATE_PATH string = "templates/article.html"
 	BASE_TEMPLATE_PATH    string = "templates/base.html"
 	ERROR_TEMPLATE_PATH   string = "templates/error.html"
+	ADMIN_LOGIN_PATH      string = "templates/log_in_form.html"
 )
 
 func RenderError(w http.ResponseWriter, code int, msg string) error {
@@ -57,7 +58,7 @@ func RenderIndexArticles(w http.ResponseWriter, articles []types.ArticleData, cu
 }
 
 func RenderArticle(w http.ResponseWriter, article types.ArticleData, prevPageNum string) error {
-	article.Text = template.HTML(MdToHtml([]byte(article.Text)))
+	article.Text = template.HTML(mdToHtml([]byte(article.Text)))
 
 	pageData := types.ArticlePage{
 		Article: types.ArticleData{
@@ -81,7 +82,21 @@ func RenderArticle(w http.ResponseWriter, article types.ArticleData, prevPageNum
 	return nil
 }
 
-func MdToHtml(md []byte) []byte {
+func RenderAdminLogInForm(w http.ResponseWriter) error {
+	tmpl, err := template.ParseFiles(BASE_TEMPLATE_PATH, ADMIN_LOGIN_PATH)
+	if err != nil {
+		return fmt.Errorf("error during template creation: " + err.Error())
+	}
+
+	err = tmpl.Execute(w, "")
+	if err != nil {
+		return fmt.Errorf("error during template populating: " + err.Error())
+	}
+
+	return nil
+}
+
+func mdToHtml(md []byte) []byte {
 	extentions := parser.CommonExtensions | parser.AutoHeadingIDs | parser.NoEmptyLineBeforeBlock
 	p := parser.NewWithExtensions(extentions)
 	doc := p.Parse(md)
