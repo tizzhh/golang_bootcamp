@@ -3,6 +3,7 @@ module myArticles
 go 1.21.0
 
 require (
+	github.com/gomarkdown/markdown v0.0.0-20240419095408-642f0ee99ae2
 	github.com/gorilla/mux v1.8.1
 	github.com/jackc/pgx/v5 v5.5.5
 )

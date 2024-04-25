@@ -5,6 +5,10 @@ import (
 	"html/template"
 	"myArticles/types"
 	"net/http"
+
+	"github.com/gomarkdown/markdown"
+	"github.com/gomarkdown/markdown/html"
+	"github.com/gomarkdown/markdown/parser"
 )
 
 const (
@@ -34,6 +38,8 @@ func RenderIndexArticles(w http.ResponseWriter, articles []types.ArticleData, cu
 }
 
 func RenderArticle(w http.ResponseWriter, article types.ArticleData, prevPageNum string) error {
+	article.Text = template.HTML(MdToHtml([]byte(article.Text)))
+
 	pageData := types.ArticlePage{
 		Article: types.ArticleData{
 			Id:       article.Id,
@@ -54,4 +60,16 @@ func RenderArticle(w http.ResponseWriter, article types.ArticleData, prevPageNum
 	}
 
 	return nil
+}
+
+func MdToHtml(md []byte) []byte {
+	extentions := parser.CommonExtensions | parser.AutoHeadingIDs | parser.NoEmptyLineBeforeBlock
+	p := parser.NewWithExtensions(extentions)
+	doc := p.Parse(md)
+
+	htmlFlags := html.CommonFlags | html.HrefTargetBlank
+	opts := html.RendererOptions{Flags: htmlFlags}
+	renderer := html.NewRenderer(opts)
+
+	return markdown.Render(doc, renderer)
 }

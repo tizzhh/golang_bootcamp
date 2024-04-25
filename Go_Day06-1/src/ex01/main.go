@@ -118,7 +118,7 @@ func (a *App) GetArticles(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	if intPageNum < 1 || intPageNum > (a.DB.TotalArticles/PAGE_LIMIT+1) {
+	if intPageNum < 1 || intPageNum > ((a.DB.TotalArticles-1)/PAGE_LIMIT+1) {
 		RespondWithError(w, "Page should be in [1; maxPages]", http.StatusBadRequest)
 		return
 	}
@@ -129,7 +129,7 @@ func (a *App) GetArticles(w http.ResponseWriter, r *http.Request) {
 		RespondWithError(w, "Server error", http.StatusBadGateway)
 		return
 	}
-	err = renderer.RenderIndexArticles(w, articles, intPageNum, a.DB.TotalArticles/PAGE_LIMIT+1)
+	err = renderer.RenderIndexArticles(w, articles, intPageNum, (a.DB.TotalArticles-1)/PAGE_LIMIT+1)
 	if err != nil {
 		log.Println("Error rendering index with GET: ", err.Error())
 		RespondWithError(w, "Server error", http.StatusBadGateway)

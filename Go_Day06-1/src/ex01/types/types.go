@@ -1,12 +1,15 @@
 package types
 
-import "time"
+import (
+	"html/template"
+	"time"
+)
 
 type ArticleData struct {
-	Id       int       `json:"id"`
-	PostDate time.Time `json:"post_date"`
-	Title    string    `json:"title"`
-	Text     string    `json:"article_text"`
+	Id       int           `json:"id"`
+	PostDate time.Time     `json:"post_date"`
+	Title    string        `json:"title"`
+	Text     template.HTML `json:"article_text"`
 }
 
 type ArticlesPage struct {
