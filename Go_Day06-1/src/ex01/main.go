@@ -51,6 +51,19 @@ func main() {
 	app.Run()
 }
 
+func (a *App) Run() {
+	log.Fatal(http.ListenAndServe(":8888", a.Router))
+}
+
+func (a *App) InitRoutes() {
+	a.Router.HandleFunc("/", a.getArticlesHandler).Methods("GET")
+	a.Router.HandleFunc("/article", a.getArticlesHandler).Methods("GET")
+	a.Router.HandleFunc("/article/{id:[0-9]+}", a.getArticleHandler).Methods("GET")
+	a.Router.HandleFunc("/"+FAVICON_PATH, faviconHandler).Methods("GET")
+	a.Router.HandleFunc("/admin", a.adminLogInHandler).Methods("GET", "POST")
+	a.Router.HandleFunc("/admin/add_article", a.adminAddArticleHandler).Methods("GET", "POST")
+}
+
 func (a *App) Init(ctx context.Context, URL string) error {
 	db, err := db.NewPG(ctx, URL)
 	if err != nil {
@@ -65,22 +78,19 @@ func (a *App) Init(ctx context.Context, URL string) error {
 	return nil
 }
 
-func (a *App) Run() {
-	log.Fatal(http.ListenAndServe(":8888", a.Router))
-}
-
-func (a *App) InitRoutes() {
-	a.Router.HandleFunc("/", a.GetArticles).Methods("GET")
-	a.Router.HandleFunc("/article", a.GetArticles).Methods("GET")
-	a.Router.HandleFunc("/article/{id:[0-9]+}", a.GetArticle).Methods("GET")
-	a.Router.HandleFunc("/"+FAVICON_PATH, faviconHandler).Methods("GET")
-}
-
 func faviconHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, FAVICON_PATH)
 }
 
-func (a *App) GetArticle(w http.ResponseWriter, r *http.Request) {
+func (a *App) adminAddArticleHandler(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func (a *App) adminLogInHandler(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func (a *App) getArticleHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
@@ -107,7 +117,7 @@ func (a *App) GetArticle(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (a *App) GetArticles(w http.ResponseWriter, r *http.Request) {
+func (a *App) getArticlesHandler(w http.ResponseWriter, r *http.Request) {
 	pageNum := r.URL.Query().Get("page")
 	intPageNum, err := strconv.Atoi(pageNum)
 	if err != nil {
@@ -138,7 +148,10 @@ func (a *App) GetArticles(w http.ResponseWriter, r *http.Request) {
 }
 
 func RespondWithError(w http.ResponseWriter, message string, code int) {
-	http.Error(w, message, code)
+	err := renderer.RenderError(w, code, message)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadGateway)
+	}
 }
 
 // This is worthless since the task makes me push the credentials for some reason. Should be in .gitignore

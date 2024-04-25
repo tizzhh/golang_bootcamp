@@ -15,7 +15,25 @@ const (
 	INDEX_TEMPLATE_PATH   string = "templates/index.html"
 	ARTICLE_TEMPLATE_PATH string = "templates/article.html"
 	BASE_TEMPLATE_PATH    string = "templates/base.html"
+	ERROR_TEMPLATE_PATH   string = "templates/error.html"
 )
+
+func RenderError(w http.ResponseWriter, code int, msg string) error {
+	pageData := types.ErrorData{
+		Code:    code,
+		Message: msg,
+	}
+	tmpl, err := template.ParseFiles(BASE_TEMPLATE_PATH, ERROR_TEMPLATE_PATH)
+	if err != nil {
+		return fmt.Errorf("error during template creation: " + err.Error())
+	}
+	err = tmpl.Execute(w, pageData)
+	if err != nil {
+		return fmt.Errorf("error during template populating: " + err.Error())
+	}
+
+	return nil
+}
 
 func RenderIndexArticles(w http.ResponseWriter, articles []types.ArticleData, curPage, totalPages int) error {
 	pageData := types.ArticlesPage{

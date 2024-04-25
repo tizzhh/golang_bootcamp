@@ -5,6 +5,11 @@ import (
 	"time"
 )
 
+type ErrorData struct {
+	Code    int
+	Message string
+}
+
 type ArticleData struct {
 	Id       int           `json:"id"`
 	PostDate time.Time     `json:"post_date"`
