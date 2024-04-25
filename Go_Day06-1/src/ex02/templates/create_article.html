@@ -1,0 +1,23 @@
+{{define "body"}}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h3>Create a new article</h3>
+            <form method="post" action="/admin/add_article">
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" class="form-control" name="title" placeholder="Enter the title">
+                </div>
+                <div class="form-group">
+                    <label for="content">Content</label>
+                    <textarea class="form-control" name="content" rows="5" placeholder="Enter the content"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Create</button>
+            </form>
+        </div>
+    </div>
+</div>
+{{if (ne . 0)}}
+<h4 class="center-headers">Here's a to a <a class="link-underline-opacity-0" href="/article/{{.}}">Link</a> created article</h4>
+{{end}}
+{{end}}

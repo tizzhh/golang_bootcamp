@@ -1,0 +1,11 @@
+{{define "body"}}
+    <div class="card my-3">
+        <div class="card-body">
+            <p class="post-date">{{.Article.PostDate}}</p>
+            <h5 class="title">{{.Article.Title}}</h5>
+            <p class="text">{{.Article.Text}}</p>
+            <a class="page-link" href="/article?page={{.PrevPageNum}}">Back</a>
+            <input type="hidden" value="{{.Article.Id}}">
+        </div>
+    </div>
+{{end}}

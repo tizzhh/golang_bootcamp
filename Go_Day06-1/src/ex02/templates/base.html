@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>Places</title>
+        <link rel="icon" type="image/x-icon" href="/images/amazing_logo.png">
+        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+        <style>
+            body {
+                padding: 20px;
+            }
+            
+            .center-headers {
+                text-align: center;
+            }
+            
+            .post-date {
+                font-size: 14px;
+                font-weight: bold;
+            }
+            
+            .title {
+                font-size: 18px;
+                font-weight: bold;
+            }
+
+            .text {
+                font-size: 16px;
+            }
+
+            .error-container {
+                max-width: 600px;
+                margin: 0 auto;
+                background-color: #fff;
+                border: 1px solid #ced4da;
+                border-radius: 5px;
+                padding: 20px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+
+        </style>
+    </head>
+    <body>
+        <h3 class="center-headers"><a href="/" class="link-underline-opacity-0">TeaWithMilkAndSugar's ☕ Articles</a></h3>
+        {{template "body" . }}
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.slim.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    </body>
+</html>
