@@ -1,0 +1,10 @@
+Test case number 9 finished with 225794393 ㎲
+Test case number 8 finished with 30230012 ㎲
+Test case number 0 finished with 408 ㎲
+Test case number 1 finished with 217 ㎲
+Test case number 3 finished with 169 ㎲
+Test case number 5 finished with 161 ㎲
+Test case number 4 finished with 95 ㎲
+Test case number 6 finished with 66 ㎲
+Test case number 2 finished with 33 ㎲
+Test case number 7 finished with 32 ㎲

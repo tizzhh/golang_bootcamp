@@ -34,3 +34,22 @@ func minCoins2(val int, coins []int) []int {
 	}
 	return res
 }
+
+func minCoins2Optimized(val int, coins []int) []int {
+	slices.Sort(coins)
+	res := make([]int, 0)
+	for i := len(coins) - 1; i >= 0; i-- {
+		if coins[i] < 1 {
+			return []int{}
+		}
+		nubmerOfSubs := val / coins[i]
+		for j := 0; j < nubmerOfSubs; j++ {
+			res = append(res, coins[i])
+		}
+		val %= coins[i]
+	}
+	if val != 0 {
+		return []int{}
+	}
+	return res
+}

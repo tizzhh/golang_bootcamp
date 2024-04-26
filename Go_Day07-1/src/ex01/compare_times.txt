@@ -1,0 +1,10 @@
+Test case number 9 minCoins2 finished with 241490255 ㎲, minCoins2Optimzed with 224907440 ㎲. The difference is: 16582815
+Test case number 8 minCoins2 finished with 32562183 ㎲, minCoins2Optimzed with 44346510 ㎲. The difference is: -11784327
+Test case number 0 minCoins2 finished with 1012 ㎲, minCoins2Optimzed with 302 ㎲. The difference is: 710
+Test case number 1 minCoins2 finished with 280 ㎲, minCoins2Optimzed with 174 ㎲. The difference is: 106
+Test case number 3 minCoins2 finished with 164 ㎲, minCoins2Optimzed with 174 ㎲. The difference is: -10
+Test case number 5 minCoins2 finished with 117 ㎲, minCoins2Optimzed with 110 ㎲. The difference is: 7
+Test case number 4 minCoins2 finished with 70 ㎲, minCoins2Optimzed with 108 ㎲. The difference is: -38
+Test case number 2 minCoins2 finished with 44 ㎲, minCoins2Optimzed with 71 ㎲. The difference is: -27
+Test case number 6 minCoins2 finished with 37 ㎲, minCoins2Optimzed with 32 ㎲. The difference is: 5
+Test case number 7 minCoins2 finished with 28 ㎲, minCoins2Optimzed with 26 ㎲. The difference is: 2
