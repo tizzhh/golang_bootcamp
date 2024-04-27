@@ -8,8 +8,11 @@ fmt:
 vet: fmt
 	go vet ./...
 
+test: vet
+	go test -v ./...
+
 build: vet
-	go build && ./crawlWeb
+	go build && ./octopus
 
 clean:
 	go clean
