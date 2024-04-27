@@ -9,7 +9,7 @@ vet: fmt
 	go vet ./...
 
 test: vet
-	go test -v
+	go test -v ./...
 
 build: vet
 	go build && ./sleepSort

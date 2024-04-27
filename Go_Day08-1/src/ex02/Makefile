@@ -8,9 +8,6 @@ fmt:
 vet: fmt
 	go vet ./...
 
-test: vet
-	go test -v
-
 build: vet
 	go build && ./school21Window
 
