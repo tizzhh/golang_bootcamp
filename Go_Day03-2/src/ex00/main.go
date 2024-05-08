@@ -11,8 +11,6 @@ import (
 const CSV_PATH string = "../../materials/data.csv"
 const MAX_ID int = 16358
 
-// const CSV_PATH string = "small_data.csv"
-
 func main() {
 	indexName := "places"
 	mapping := `{
