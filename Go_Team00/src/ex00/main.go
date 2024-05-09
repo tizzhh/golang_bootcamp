@@ -42,7 +42,7 @@ func (s *Server) TransmitVals(em *pb.EmptyBody, stream pb.Transmit_TransmitValsS
 		if err != nil {
 			return err
 		}
-		time.Sleep(1 * time.Second)
+		time.Sleep(100 * time.Millisecond)
 	}
 }
 
