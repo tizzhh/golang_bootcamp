@@ -104,11 +104,10 @@ func main() {
 	}
 
 	dbConn, err := getDbConn()
-	dbConn.AutoMigrate(&Frequencies{})
-
 	if err != nil {
-		log.Fatalf("error openning a db connection: %v\v", err)
+		log.Fatalf("error openning a db connection: %v\n", err)
 	}
+	dbConn.AutoMigrate(&Frequencies{})
 
 	server := grpc.NewServer()
 	myTransmitterServer := &Server{db: dbConn}

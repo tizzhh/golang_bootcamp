@@ -1,3 +1,4 @@
 transmitterGRPC
 anomalyDetection
 transmitterGRPCWriteToDB
+.env
